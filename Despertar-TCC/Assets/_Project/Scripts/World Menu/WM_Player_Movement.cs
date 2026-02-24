@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 public class WM_Player_Movement : MonoBehaviour
 {
@@ -43,7 +44,7 @@ public class WM_Player_Movement : MonoBehaviour
         if(!input.performed)
         return;
 
-        int sidePressed = (int)(input.ReadValue<Vector2>().x);
+        float sidePressed = (input.ReadValue<Vector2>().x);
         Debug.Log($"click value: {sidePressed}");
 
         if(sidePressed > 0.5f)

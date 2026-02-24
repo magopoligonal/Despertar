@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -6,38 +7,55 @@ public class PauseManager : MonoBehaviour
 {
 
     [SerializeField] private GameObject pauseMenuCanvas;
-    [SerializeField] private GameObject ui_Input;
-    [SerializeField] private bool isPaused;
+    private bool isPaused = false;
 
+    public bool IsPaused { get => isPaused; set => isPaused = value; }
 
-    void LateUpdate()
+    //Events
+    public static event Action OnPausePress;
+
+    void Start()
     {
-        if(SceneManager.GetActiveScene().name.Equals(SceneStrings.scnMenuPrincipal))
-        {
-            ui_Input.SetActive(false);
-            Debug.Log("Menu Pause desativado com sucesso!");
-        }
-        else
-        {
-            ui_Input.SetActive(true);
-            Debug.Log("Menu pause reativado com sucesso");
-        }
+        pauseMenuCanvas.SetActive(false);
     }
+
 
     public void OnPause(InputAction.CallbackContext input)
     {
-        if (input.performed)
+        //verificar qual cena estou e se não estiver no menu(controlar isso por gamestate depois) emite o evento
+        if(input.performed && SceneManager.GetActiveScene().name.Equals(SceneStrings.scnMenuPrincipal))
         {
-            if (!isPaused)
-            {
-                pauseMenuCanvas.SetActive(true);
-                isPaused = true;
-            }
-            else
-            {
-                isPaused = false;
-                pauseMenuCanvas.SetActive(false);
-            }
+            return;
         }
+        else if(input.performed)
+        {
+            OnPausePress?.Invoke();
+        }
+    }
+
+    //Get set
+    public GameObject GetPauseMenuCanvas()
+    {
+        return pauseMenuCanvas;
+    }
+    public void SetActivePauseMenuCanvas(bool isActive)
+    {
+        if(isActive)
+        {
+            pauseMenuCanvas.SetActive(true);
+            Debug.Log("O menu pause foi ativado.");
+        }
+        else
+        {
+            pauseMenuCanvas.SetActive(false);
+            Debug.Log("O menu pause foi desativado.");
+        }
+    }
+
+    public void TurnOffOnSceneChanged()
+    {
+        pauseMenuCanvas.SetActive(false);
+        Time.timeScale = 1f;
+        isPaused = false;
     }
 }
